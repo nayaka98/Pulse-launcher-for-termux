@@ -71,7 +71,7 @@
            └─────────────────────────┘
 ```
 
-### Fixed (pulse_start_fixed.c)
+### Fixed (pulse_start_fixed_v2.c)
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │                        MAIN PROGRAM                          │
@@ -225,13 +225,13 @@
 │                                                                 │
 │ export PULSE_TCP_PORT=4713 (optional)                          │
 │                                                                 │
-│ eval "$(pulse_start_fixed)"                                    │
+│ eval "$(pulse_start_fixed_v2)"                                    │
 │  │                                                              │
-│  └─ SUBSHELL: /bin/sh -c "pulse_start_fixed > /dev/stdout"     │
+│  └─ SUBSHELL: /bin/sh -c "pulse_start_fixed_v2 > /dev/stdout"     │
 │     │                                                           │
 │     ▼                                                           │
 │     ┌──────────────────────────────────────────┐              │
-│     │ PROGRAM (pulse_start_fixed)              │              │
+│     │ PROGRAM (pulse_start_fixed_v2)              │              │
 │     │                                          │              │
 │     │ unsetenv("PULSE_SERVER")                 │              │
 │     │ unsetenv("PULSE_LATENCY_MSEC")           │              │
@@ -328,7 +328,7 @@
 ├──────────────────────────────────────────────────────────────┤
 │                                                              │
 │ Terminal 1:                                                 │
-│ $ eval "$(pulse_start_fixed)"                              │
+│ $ eval "$(pulse_start_fixed_v2)"                              │
 │                                                              │
 │ ┌─────────────────────────────────────────┐               │
 │ │ [tmux has-session -t pulse_session?]   │               │

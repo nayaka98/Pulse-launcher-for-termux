@@ -5,7 +5,7 @@
 | File | Purpose | Type |
 |------|---------|------|
 | `ANALISIS_DETAIL.md` | Deep code analysis | Documentation |
-| `pulse_start_fixed.c` | Improved C version | Source Code |
+| `pulse_start_fixed_v2.c` | Improved C version | Source Code |
 | `pulse_start_arm64.s` | ARM64 assembly | Low-level Code |
 | `BUGFIX_GUIDE.md` | Detailed bug fixes | Documentation |
 | `BUILD_AND_USE.sh` | Build script + setup | Shell Script |
@@ -19,7 +19,7 @@
 
 ```
 ┌──────────────────────────────────────┬──────────────────────────────────┐
-│ ORIGINAL (pulse_start.c)              │ FIXED (pulse_start_fixed.c)       │
+│ ORIGINAL (pulse_start.c)              │ FIXED (pulse_start_fixed_v2.c)       │
 ├──────────────────────────────────────┼──────────────────────────────────┤
 │ Lines: ~295                          │ Lines: ~400                      │
 │ Binary size: ~20KB                   │ Binary size: ~25KB               │
@@ -41,13 +41,13 @@
 ### Termux
 ```bash
 # Copy file
-cp pulse_start_fixed.c ~/pulse_start_fixed.c
+cp pulse_start_fixed_v2.c ~/pulse_start_fixed_v2.c
 
 # Build (one-liner)
-gcc -O2 -s -Wall -o ~/pulse_start_fixed ~/pulse_start_fixed.c
+gcc -O2 -s -Wall -o ~/pulse_start_fixed_v2 ~/pulse_start_fixed_v2.c
 
 # Test
-eval "$(~/pulse_start_fixed)"
+eval "$(~/pulse_start_fixed_v2)"
 pactl info
 ```
 
@@ -57,7 +57,7 @@ pactl info
 pkg install tmux
 
 # Run with tmux integration
-eval "$(~/pulse_start_fixed)"
+eval "$(~/pulse_start_fixed_v2)"
 
 # In another terminal
 tmux attach -t pulse_session
@@ -76,7 +76,7 @@ chmod +x BUILD_AND_USE.sh
 ### What to eval
 
 ```bash
-eval "$(pulse_start_fixed)"
+eval "$(pulse_start_fixed_v2)"
 ```
 
 This sets in current shell:
@@ -91,15 +91,15 @@ PULSE_LATENCY_MSEC=60
 ```bash
 # Custom port
 export PULSE_TCP_PORT=4720
-eval "$(pulse_start_fixed)"
+eval "$(pulse_start_fixed_v2)"
 
 # Custom latency
 export PULSE_LATENCY_MSEC=100
-eval "$(pulse_start_fixed)"
+eval "$(pulse_start_fixed_v2)"
 
 # Custom XDG directory
 export XDG_RUNTIME_DIR=/my/custom/dir
-eval "$(pulse_start_fixed)"
+eval "$(pulse_start_fixed_v2)"
 ```
 
 ---
@@ -116,7 +116,7 @@ eval "$(pulse_start_fixed)"
 unset PULSE_SERVER PULSE_LATENCY_MSEC
 
 # Re-eval
-eval "$(pulse_start_fixed)"
+eval "$(pulse_start_fixed_v2)"
 
 # Check
 echo $PULSE_SERVER
@@ -153,7 +153,7 @@ netstat -tuln | grep 4713
 ```bash
 # Try different port
 export PULSE_TCP_PORT=4720
-eval "$(pulse_start_fixed)"
+eval "$(pulse_start_fixed_v2)"
 ```
 
 ### Issue: "Tmux session not created"
@@ -195,7 +195,7 @@ mkdir -p ~/log
 chmod 700 ~/log
 
 # Then try
-eval "$(pulse_start_fixed)"
+eval "$(pulse_start_fixed_v2)"
 ```
 
 ---
@@ -237,10 +237,10 @@ cbz x0, label   ; Compare and branch if zero
 
 ```
 [ ] Binary compiles without warnings
-[ ] Can run: ./pulse_start_fixed
+[ ] Can run: ./pulse_start_fixed_v2
 [ ] Output shows colored messages
 [ ] Environment vars are output
-[ ] eval "$(./pulse_start_fixed)" works
+[ ] eval "$(./pulse_start_fixed_v2)" works
 [ ] PULSE_SERVER is set in $()
 [ ] pactl info connects (if PA running)
 [ ] Logs created in ~/log/pulseaudio.log
@@ -326,10 +326,10 @@ Text Segment (read-only)
 
 ```
 # Run with strace
-strace -e trace=process,file,exec ./pulse_start_fixed
+strace -e trace=process,file,exec ./pulse_start_fixed_v2
 
 # Output (relevant part):
-execve("./pulse_start_fixed", ["./pulse_start_fixed"], ...)
+execve("./pulse_start_fixed_v2", ["./pulse_start_fixed_v2"], ...)
 open("/data/data/.../log", O_WRONLY|O_CREAT|O_APPEND) = 3
 fork()                                    = 12345
 waitpid(12345, &status, 0)               = 12345
@@ -355,13 +355,13 @@ fprintf(stderr, "DEBUG: pulseaudio_running() = %d\n", result);
 ### Strace monitoring
 ```bash
 # See all system calls
-strace -f ./pulse_start_fixed 2>&1 | tee trace.log
+strace -f ./pulse_start_fixed_v2 2>&1 | tee trace.log
 
 # Filter specific syscalls
-strace -e trace=execve,fork,wait4 ./pulse_start_fixed
+strace -e trace=execve,fork,wait4 ./pulse_start_fixed_v2
 
 # Follow child processes
-strace -f ./pulse_start_fixed
+strace -f ./pulse_start_fixed_v2
 ```
 
 ### Direct log inspection
@@ -400,7 +400,7 @@ ss -tuln | grep 4713
 ```bash
 # Remote machine
 ssh user@android-phone
-eval "$(pulse_start_fixed)"
+eval "$(pulse_start_fixed_v2)"
 
 # Now can use audio over TCP!
 pactl info
@@ -409,17 +409,17 @@ pactl info
 ### With Docker/Container
 ```bash
 # If running Termux in container
-docker exec android bash -c 'eval "$(pulse_start_fixed)"'
+docker exec android bash -c 'eval "$(pulse_start_fixed_v2)"'
 ```
 
 ### In Cron Job
 ```bash
 # Add to crontab
-@reboot eval "$(~/pulse_start_fixed)" 2>/dev/null
+@reboot eval "$(~/pulse_start_fixed_v2)" 2>/dev/null
 
 # Or script:
 #!/bin/bash
-eval "$(~/pulse_start_fixed)"
+eval "$(~/pulse_start_fixed_v2)"
 # ... rest of audio setup ...
 ```
 
@@ -431,7 +431,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/home/user/pulse_start_fixed
+ExecStart=/home/user/pulse_start_fixed_v2
 RemainAfterExit=yes
 
 [Install]
@@ -445,7 +445,7 @@ WantedBy=default.target
 ### Recommended permissions
 ```bash
 # Binary
-chmod 755 ~/pulse_start_fixed
+chmod 755 ~/pulse_start_fixed_v2
 
 # Log directory
 chmod 700 ~/log
@@ -530,18 +530,18 @@ bash BUILD_AND_USE.sh diagnose > diagnostics.txt
 
 ```bash
 # One-liner to build and use
-gcc -O2 -s -o pulse_start_fixed pulse_start_fixed.c && \
-eval "$(./pulse_start_fixed)" && \
+gcc -O2 -s -o pulse_start_fixed_v2 pulse_start_fixed_v2.c && \
+eval "$(./pulse_start_fixed_v2)" && \
 pactl info
 
 # With tmux
-gcc -O2 -s -o pulse_start_fixed pulse_start_fixed.c && \
-eval "$(./pulse_start_fixed)" && \
+gcc -O2 -s -o pulse_start_fixed_v2 pulse_start_fixed_v2.c && \
+eval "$(./pulse_start_fixed_v2)" && \
 tmux attach -t pulse_session
 
 # Install to PATH
-gcc -O2 -s -o ~/bin/pulse_start_fixed pulse_start_fixed.c && \
-echo "eval \"\$(pulse_start_fixed)\"" >> ~/.bashrc && \
+gcc -O2 -s -o ~/bin/pulse_start_fixed_v2 pulse_start_fixed_v2.c && \
+echo "eval \"\$(pulse_start_fixed_v2)\"" >> ~/.bashrc && \
 source ~/.bashrc
 ```
 

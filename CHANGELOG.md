@@ -1,9 +1,9 @@
 # CHANGELOG — pulse_start_fixed_v2.c
 
-## Round 2 Bugfixes (di atas v1 pulse_start_fixed.c)
+## Round 2 Bugfixes (di atas v1 pulse_start_fixed_v2.c)
 
 Setelah review ulang lebih dalam, ditemukan **6 bug tambahan**, termasuk **1 bug kritis**
-yang bisa merusak alur `eval "$(pulse_start_fixed)"` yang jadi cara pakai utama tool ini.
+yang bisa merusak alur `eval "$(pulse_start_fixed_v2)"` yang jadi cara pakai utama tool ini.
 
 ---
 
@@ -18,12 +18,12 @@ int rc = posix_spawn(&pid, PACTL_PATH, NULL, NULL, argv, child_envp);
 ```
 
 `print_export_lines()` **juga** menulis ke stdout (fd 1) — ini memang harus,
-supaya `eval "$(pulse_start_fixed)"` bisa menangkap `export ...`.
+supaya `eval "$(pulse_start_fixed_v2)"` bisa menangkap `export ...`.
 
 Tapi karena `pactl info` **juga** ditulis ke stdout yang sama, ketika user
 menjalankan:
 ```bash
-eval "$(pulse_start_fixed)"
+eval "$(pulse_start_fixed_v2)"
 ```
 Shell akan menangkap SEMUA baris — termasuk output manusia dari `pactl info`
 seperti:
@@ -127,7 +127,7 @@ static int validate_int_range(int val, int min, int max) {
 Contoh nyata:
 ```bash
 export PULSE_LATENCY_MSEC=999999   # user salah ketik / typo
-eval "$(pulse_start_fixed)"
+eval "$(pulse_start_fixed_v2)"
 ```
 Yang diharapkan: nilai di-clamp ke maksimum (10000ms).
 Yang terjadi: nilai malah jatuh ke **minimum (1ms)** — jauh dari yang

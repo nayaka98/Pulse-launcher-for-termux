@@ -20,7 +20,7 @@ static void init_child_env(void) {
 - Never freed, even on error exit paths
 - Program exits, OS reclaims memory, but technically a resource leak
 
-**Fix (pulse_start_fixed.c):**
+**Fix (pulse_start_fixed_v2.c):**
 ```c
 static void cleanup_and_exit(int code) {
     if (child_envp != NULL) {
@@ -157,7 +157,7 @@ if (pulseaudio_process_running()) {  // T1: Check
 - `start_pulseaudio()` would spawn a second instance
 - Race condition on single-user Termux is minimal, but technically unsafe
 
-**Fix (Advanced, not in pulse_start_fixed.c):**
+**Fix (Advanced, not in pulse_start_fixed_v2.c):**
 ```c
 // Use lock file for atomicity
 int lockfd = open("/data/data/.../pulse_start.lock", O_CREAT | O_EXCL | O_WRONLY);
@@ -214,7 +214,7 @@ static void print_export_lines(void) {
 ```
 // In usage instructions (stderr + stdout):
 write_colored_msg(2, GRN, "To apply environment variables, run:", 1);
-write_colored_msg(2, GRN, "  eval \"$(pulse_start_fixed)\"", 1);
+write_colored_msg(2, GRN, "  eval \"$(pulse_start_fixed_v2)\"", 1);
 ```
 
 **Impact:** Explicit documentation that output must be eval'd.
@@ -266,27 +266,27 @@ export PULSE_LATENCY_MSEC=60
 
 #### METHOD 1: Direct eval (Recommended)
 ```bash
-eval "$(pulse_start_fixed)"
+eval "$(pulse_start_fixed_v2)"
 # Now PULSE_SERVER is set in current shell
 pactl info
 ```
 
 #### METHOD 2: Subshell (Limited scope)
 ```bash
-$(pulse_start_fixed)  # Sets vars, but only for subshell
+$(pulse_start_fixed_v2)  # Sets vars, but only for subshell
 pactl info            # Won't work! vars not in current shell
 ```
 
 #### METHOD 3: Source in script
 ```bash
 #!/bin/bash
-eval "$(pulse_start_fixed)"
+eval "$(pulse_start_fixed_v2)"
 # Variables now available for entire script
 ```
 
 #### METHOD 4: Export manually
 ```bash
-pulse_start_fixed > /tmp/pa_exports.sh
+pulse_start_fixed_v2 > /tmp/pa_exports.sh
 source /tmp/pa_exports.sh
 # Or: . /tmp/pa_exports.sh (POSIX)
 ```
@@ -342,16 +342,16 @@ Default: 4713
 
 Purpose:
   - Which port PulseAudio TCP module listens on
-  - Set BEFORE calling pulse_start_fixed
+  - Set BEFORE calling pulse_start_fixed_v2
 
 Example:
   export PULSE_TCP_PORT=4720
-  eval "$(pulse_start_fixed)"
+  eval "$(pulse_start_fixed_v2)"
 ```
 
 ---
 
-## 3. IMPROVED FEATURES IN pulse_start_fixed.c
+## 3. IMPROVED FEATURES IN pulse_start_fixed_v2.c
 
 ### Feature 1: Colored Output
 ```c
@@ -395,7 +395,7 @@ if (config.use_tmux && !tmux_session_exists()) {
 
 **Usage:**
 ```bash
-eval "$(pulse_start_fixed)"
+eval "$(pulse_start_fixed_v2)"
 # In another terminal:
 tmux attach -t pulse_session
 # Shows PulseAudio output in real-time
@@ -482,13 +482,13 @@ msub x0, x1, x2, x3  ; Multiply-subtract: x0 = x3 - x1*x2
 ```bash
 # Termux:
 cd /data/data/com.termux/files/home
-gcc -O2 -s -Wall -o pulse_start_fixed pulse_start_fixed.c
+gcc -O2 -s -Wall -o pulse_start_fixed_v2 pulse_start_fixed_v2.c
 
 # Or with clang:
-clang -O2 -s -Wall -o pulse_start_fixed pulse_start_fixed.c
+clang -O2 -s -Wall -o pulse_start_fixed_v2 pulse_start_fixed_v2.c
 
 # Make executable:
-chmod +x pulse_start_fixed
+chmod +x pulse_start_fixed_v2
 ```
 
 ### Assembly Version (ARM64)
@@ -506,13 +506,13 @@ gcc -o pulse_start_arm64 pulse_start_arm64.o -lc
 ### Testing
 ```bash
 # Test 1: Check if executable works
-./pulse_start_fixed
+./pulse_start_fixed_v2
 
 # Test 2: Check output formatting
-./pulse_start_fixed 2>&1 | head -20
+./pulse_start_fixed_v2 2>&1 | head -20
 
 # Test 3: Eval environment variables
-eval "$(./pulse_start_fixed)"
+eval "$(./pulse_start_fixed_v2)"
 echo $PULSE_SERVER
 
 # Test 4: Connect to PulseAudio

@@ -4,10 +4,10 @@
 
 Warning yang kamu dapat:
 ```
-pulse_start_fixed.c:25:9: warning: '_GNU_SOURCE' macro redefined
-pulse_start_fixed.c:401:14: warning: unused parameter 'argc'
-pulse_start_fixed.c:401:26: warning: unused parameter 'argv'
-pulse_start_fixed.c:324:13: warning: unused function 'tmux_send_info'
+pulse_start_fixed_v2.c:25:9: warning: '_GNU_SOURCE' macro redefined
+pulse_start_fixed_v2.c:401:14: warning: unused parameter 'argc'
+pulse_start_fixed_v2.c:401:26: warning: unused parameter 'argv'
+pulse_start_fixed_v2.c:324:13: warning: unused function 'tmux_send_info'
 ```
 
 Ini semua berasal dari **compile flags clang di Termux** yang lebih ketat
@@ -15,7 +15,7 @@ default-nya dibanding gcc biasa (clang di Termux biasanya sudah define
 `_GNU_SOURCE` lewat command line / target triple, jadi `#define _GNU_SOURCE`
 di dalam source jadi dianggap redefinisi).
 
-**Sudah diperbaiki di kedua file** (`pulse_start_fixed.c` v1 dan
+**Sudah diperbaiki di kedua file** (`pulse_start_fixed_v2.c` v1 dan
 `pulse_start_fixed_v2.c`):
 
 ### Fix #1 — `_GNU_SOURCE` redefinition
@@ -64,7 +64,7 @@ cd ~/pulse_start_package
 clang -O2 -s -Wall -Wextra -o pulse_start_fixed_v2 pulse_start_fixed_v2.c
 
 # v1 (kalau mau bandingkan)
-clang -O2 -s -Wall -Wextra -o pulse_start_fixed pulse_start_fixed.c
+clang -O2 -s -Wall -Wextra -o pulse_start_fixed_v2 pulse_start_fixed_v2.c
 ```
 
 Kedua file ini sudah ditest compile bersih (0 warning) dengan
