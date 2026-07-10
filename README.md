@@ -3,11 +3,8 @@
 A hardened, bug-fixed PulseAudio startup utility for Termux/Android — with
 automatic tmux integration for real-time log viewing.
 
-![Showcase](img/showcase.gif)
+![Showcase](showcase.gif)
 
-> No recording yet — this image will appear once you add your own
-> `img/showcase.gif`. See [`img/README.md`](img/README.md) for
-> quick instructions on recording one from your device.
 
 ---
 
